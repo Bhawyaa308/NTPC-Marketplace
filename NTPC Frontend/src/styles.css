@@ -1,0 +1,92 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-soft: 0 4px 16px -4px rgba(15, 23, 42, 0.08);
+  --shadow-pop: 0 10px 30px -12px rgba(0, 61, 120, 0.25);
+}
+
+:root {
+  --background: #f7f9fc;
+  --surface: #ffffff;
+  --foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --primary: #003d78;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e6eef7;
+  --accent: #ff7a00;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0ea5e9;
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body { background-color: var(--color-background); color: var(--color-foreground); }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+}
+
+@utility ntpc-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-card);
+}
+
+@utility ntpc-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  padding: 0.55rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.15s ease;
+  &:hover { background-color: #002a55; }
+}
+
+@utility ntpc-btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.95rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  &:hover { background-color: var(--color-primary-soft); }
+}
+
+@utility ntpc-input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  &:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(0,61,120,0.12); }
+}
