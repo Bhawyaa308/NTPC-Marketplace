@@ -47,7 +47,25 @@ async function getAllReports(req, res, next) {
 
 async function updateReportStatus(req, res, next) {
   try {
-    const report = await reportsService.updateReportStatus(req.params.id, req.body);
+    const report = await reportsService.updateReportStatus(req.params.id, req.body?.status, req.user.user_id);
+    return res.status(200).json(report);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+async function resolveReport(req, res, next) {
+  try {
+    const report = await reportsService.resolveReport(req.params.id, req.user.user_id);
+    return res.status(200).json(report);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+async function rejectReport(req, res, next) {
+  try {
+    const report = await reportsService.rejectReport(req.params.id, req.user.user_id);
     return res.status(200).json(report);
   } catch (err) {
     return next(err);
@@ -61,4 +79,6 @@ module.exports = {
   withdrawReport,
   getAllReports,
   updateReportStatus,
+  resolveReport,
+  rejectReport,
 };

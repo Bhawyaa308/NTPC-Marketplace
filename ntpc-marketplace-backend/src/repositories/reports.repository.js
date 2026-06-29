@@ -22,10 +22,24 @@ async function createReport(listing_id, reported_by, reason) {
 
 async function getReportsByUser(user_id) {
   const { rows } = await pool.query(
-    `SELECT report_id, listing_id, reported_by, reviewed_by, reason, status, created_at, resolved_at
-     FROM listing_reports
-     WHERE reported_by = $1
-     ORDER BY created_at DESC`,
+    `SELECT
+       lr.report_id,
+       lr.listing_id,
+       lr.reported_by,
+       lr.reviewed_by,
+       lr.reason,
+       lr.status,
+       lr.created_at,
+       lr.resolved_at,
+       reporter.name AS reporter_name,
+       listing.title AS listing_title,
+       seller.name AS seller_name
+     FROM listing_reports lr
+     JOIN users reporter ON reporter.user_id = lr.reported_by
+     JOIN listings listing ON listing.listing_id = lr.listing_id
+     JOIN users seller ON seller.user_id = listing.seller_id
+     WHERE lr.reported_by = $1
+     ORDER BY lr.created_at DESC`,
     [user_id]
   );
 
@@ -34,9 +48,23 @@ async function getReportsByUser(user_id) {
 
 async function getReportById(report_id) {
   const { rows } = await pool.query(
-    `SELECT report_id, listing_id, reported_by, reviewed_by, reason, status, created_at, resolved_at
-     FROM listing_reports
-     WHERE report_id = $1
+    `SELECT
+       lr.report_id,
+       lr.listing_id,
+       lr.reported_by,
+       lr.reviewed_by,
+       lr.reason,
+       lr.status,
+       lr.created_at,
+       lr.resolved_at,
+       reporter.name AS reporter_name,
+       listing.title AS listing_title,
+       seller.name AS seller_name
+     FROM listing_reports lr
+     JOIN users reporter ON reporter.user_id = lr.reported_by
+     JOIN listings listing ON listing.listing_id = lr.listing_id
+     JOIN users seller ON seller.user_id = listing.seller_id
+     WHERE lr.report_id = $1
      LIMIT 1`,
     [report_id]
   );
@@ -75,13 +103,15 @@ async function getAllReports() {
   return rows;
 }
 
-async function updateReportStatus(report_id, status) {
+async function updateReportStatus(report_id, status, reviewed_by) {
   const { rows } = await pool.query(
     `UPDATE listing_reports
-     SET status = $2, reviewed_at = NOW(), resolved_at = CASE WHEN $2 = 'RESOLVED' THEN NOW() ELSE resolved_at END
+     SET status = $2,
+         reviewed_by = $3,
+         resolved_at = CASE WHEN $2 IN ('RESOLVED', 'REJECTED') THEN NOW() ELSE resolved_at END
      WHERE report_id = $1
      RETURNING report_id, listing_id, reported_by, reviewed_by, reason, status, created_at, resolved_at`,
-    [report_id, status]
+    [report_id, status, reviewed_by]
   );
 
   return rows[0];

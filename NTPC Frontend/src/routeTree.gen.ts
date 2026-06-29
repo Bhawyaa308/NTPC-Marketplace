@@ -32,6 +32,7 @@ import { Route as SuperSuperAdminIndexRouteImport } from './routes/_super.super-
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
 import { Route as SuperSuperAdminTownshipsRouteImport } from './routes/_super.super-admin.townships'
 import { Route as SuperSuperAdminSettingsRouteImport } from './routes/_super.super-admin.settings'
+import { Route as SuperSuperAdminProfileRouteImport } from './routes/_super.super-admin.profile'
 import { Route as SuperSuperAdminDepartmentsRouteImport } from './routes/_super.super-admin.departments'
 import { Route as SuperSuperAdminAuditLogsRouteImport } from './routes/_super.super-admin.audit-logs'
 import { Route as SuperSuperAdminAnalyticsRouteImport } from './routes/_super.super-admin.analytics'
@@ -156,6 +157,11 @@ const SuperSuperAdminSettingsRoute = SuperSuperAdminSettingsRouteImport.update({
   path: '/super-admin/settings',
   getParentRoute: () => SuperRoute,
 } as any)
+const SuperSuperAdminProfileRoute = SuperSuperAdminProfileRouteImport.update({
+  id: '/super-admin/profile',
+  path: '/super-admin/profile',
+  getParentRoute: () => SuperRoute,
+} as any)
 const SuperSuperAdminDepartmentsRoute =
   SuperSuperAdminDepartmentsRouteImport.update({
     id: '/super-admin/departments',
@@ -237,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/super-admin/analytics': typeof SuperSuperAdminAnalyticsRoute
   '/super-admin/audit-logs': typeof SuperSuperAdminAuditLogsRoute
   '/super-admin/departments': typeof SuperSuperAdminDepartmentsRoute
+  '/super-admin/profile': typeof SuperSuperAdminProfileRoute
   '/super-admin/settings': typeof SuperSuperAdminSettingsRoute
   '/super-admin/townships': typeof SuperSuperAdminTownshipsRoute
   '/admin/': typeof AdminAdminIndexRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/super-admin/analytics': typeof SuperSuperAdminAnalyticsRoute
   '/super-admin/audit-logs': typeof SuperSuperAdminAuditLogsRoute
   '/super-admin/departments': typeof SuperSuperAdminDepartmentsRoute
+  '/super-admin/profile': typeof SuperSuperAdminProfileRoute
   '/super-admin/settings': typeof SuperSuperAdminSettingsRoute
   '/super-admin/townships': typeof SuperSuperAdminTownshipsRoute
   '/admin': typeof AdminAdminIndexRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/_super/super-admin/analytics': typeof SuperSuperAdminAnalyticsRoute
   '/_super/super-admin/audit-logs': typeof SuperSuperAdminAuditLogsRoute
   '/_super/super-admin/departments': typeof SuperSuperAdminDepartmentsRoute
+  '/_super/super-admin/profile': typeof SuperSuperAdminProfileRoute
   '/_super/super-admin/settings': typeof SuperSuperAdminSettingsRoute
   '/_super/super-admin/townships': typeof SuperSuperAdminTownshipsRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
@@ -339,6 +348,7 @@ export interface FileRouteTypes {
     | '/super-admin/analytics'
     | '/super-admin/audit-logs'
     | '/super-admin/departments'
+    | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/townships'
     | '/admin/'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/super-admin/analytics'
     | '/super-admin/audit-logs'
     | '/super-admin/departments'
+    | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/townships'
     | '/admin'
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/_super/super-admin/analytics'
     | '/_super/super-admin/audit-logs'
     | '/_super/super-admin/departments'
+    | '/_super/super-admin/profile'
     | '/_super/super-admin/settings'
     | '/_super/super-admin/townships'
     | '/_admin/admin/'
@@ -584,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperSuperAdminSettingsRouteImport
       parentRoute: typeof SuperRoute
     }
+    '/_super/super-admin/profile': {
+      id: '/_super/super-admin/profile'
+      path: '/super-admin/profile'
+      fullPath: '/super-admin/profile'
+      preLoaderRoute: typeof SuperSuperAdminProfileRouteImport
+      parentRoute: typeof SuperRoute
+    }
     '/_super/super-admin/departments': {
       id: '/_super/super-admin/departments'
       path: '/super-admin/departments'
@@ -730,6 +749,7 @@ interface SuperRouteChildren {
   SuperSuperAdminAnalyticsRoute: typeof SuperSuperAdminAnalyticsRoute
   SuperSuperAdminAuditLogsRoute: typeof SuperSuperAdminAuditLogsRoute
   SuperSuperAdminDepartmentsRoute: typeof SuperSuperAdminDepartmentsRoute
+  SuperSuperAdminProfileRoute: typeof SuperSuperAdminProfileRoute
   SuperSuperAdminSettingsRoute: typeof SuperSuperAdminSettingsRoute
   SuperSuperAdminTownshipsRoute: typeof SuperSuperAdminTownshipsRoute
   SuperSuperAdminIndexRoute: typeof SuperSuperAdminIndexRoute
@@ -739,6 +759,7 @@ const SuperRouteChildren: SuperRouteChildren = {
   SuperSuperAdminAnalyticsRoute: SuperSuperAdminAnalyticsRoute,
   SuperSuperAdminAuditLogsRoute: SuperSuperAdminAuditLogsRoute,
   SuperSuperAdminDepartmentsRoute: SuperSuperAdminDepartmentsRoute,
+  SuperSuperAdminProfileRoute: SuperSuperAdminProfileRoute,
   SuperSuperAdminSettingsRoute: SuperSuperAdminSettingsRoute,
   SuperSuperAdminTownshipsRoute: SuperSuperAdminTownshipsRoute,
   SuperSuperAdminIndexRoute: SuperSuperAdminIndexRoute,

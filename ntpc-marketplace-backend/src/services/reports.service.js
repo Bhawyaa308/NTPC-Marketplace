@@ -35,7 +35,7 @@ async function createReport(user_id, payload) {
   }
 
   const report = await reportsRepository.createReport(listing_id, user_id, reason);
-  return report;
+  return reportsRepository.getReportById(report.report_id);
 }
 
 function normalizeRole(role) {
@@ -94,29 +94,36 @@ async function withdrawReport(reportId, user_id) {
     throw createError(404, 'Report not found');
   }
 
-  return updatedReport;
+  return reportsRepository.getReportById(updatedReport.report_id);
 }
 
 async function getAllReports() {
   return reportsRepository.getAllReports();
 }
 
-async function updateReportStatus(reportId, payload) {
-  const status = payload?.status;
-  const validStatuses = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'REJECTED'];
+async function updateReportStatus(reportId, status, adminUserId) {
+  const validStatuses = ['RESOLVED', 'REJECTED'];
 
   if (!status || !validStatuses.includes(String(status).toUpperCase())) {
     throw createError(400, 'Valid status is required');
   }
 
-  const report = await reportsRepository.updateReportStatus(reportId, String(status).toUpperCase());
+  const currentReport = await reportsRepository.getReportById(reportId);
+  if (!currentReport) {
+    throw createError(404, 'Report not found');
+  }
+
+  if (String(currentReport.status).toUpperCase() === 'WITHDRAWN') {
+    throw createError(400, 'Withdrawn reports cannot be updated');
+  }
+
+  const normalizedStatus = String(status).toUpperCase();
+  const report = await reportsRepository.updateReportStatus(reportId, normalizedStatus, adminUserId);
   if (!report) {
     throw createError(404, 'Report not found');
   }
 
   const messageMap = {
-    OPEN: 'Your report has been received.',
-    IN_REVIEW: 'Your report is under review.',
     RESOLVED: 'Your report has been resolved.',
     REJECTED: 'Your report was rejected.',
   };
@@ -124,13 +131,21 @@ async function updateReportStatus(reportId, payload) {
   await createNotification({
     user_id: report.reported_by,
     title: 'Report status updated',
-    message: messageMap[String(status).toUpperCase()] || 'Your report status has been updated.',
+    message: messageMap[normalizedStatus] || 'Your report status has been updated.',
     type: 'REPORT',
     related_entity_type: 'REPORT',
     related_entity_id: report.report_id,
   });
 
-  return report;
+  return reportsRepository.getReportById(report.report_id);
+}
+
+async function resolveReport(reportId, adminUserId) {
+  return updateReportStatus(reportId, 'RESOLVED', adminUserId);
+}
+
+async function rejectReport(reportId, adminUserId) {
+  return updateReportStatus(reportId, 'REJECTED', adminUserId);
 }
 
 module.exports = {
@@ -140,4 +155,6 @@ module.exports = {
   withdrawReport,
   getAllReports,
   updateReportStatus,
+  resolveReport,
+  rejectReport,
 };

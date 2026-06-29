@@ -48,6 +48,14 @@ export function useNotifications() {
   }, [reloadNotifications]);
 
   useEffect(() => {
+    const handleChanged = () => {
+      void reloadNotifications();
+    };
+    window.addEventListener("notifications:changed", handleChanged);
+    return () => window.removeEventListener("notifications:changed", handleChanged);
+  }, [reloadNotifications]);
+
+  useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
 

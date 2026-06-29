@@ -1,6 +1,7 @@
 const express = require('express');
 const listingsController = require('../controllers/listings.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const { authorizeRoles } = require('../middlewares/rbac.middleware');
 const { createListingValidator, updateListingValidator } = require('../validators/listings.validator');
 
 const router = express.Router();
@@ -58,6 +59,20 @@ router.post('/', authMiddleware, createListingValidator, listingsController.crea
  *                 $ref: '#/components/schemas/Listing'
  */
 router.get('/', listingsController.getAllListings);
+
+router.patch(
+  '/admin/:id/status',
+  authMiddleware,
+  authorizeRoles('ADMIN', 'SUPER_ADMIN'),
+  listingsController.updateListingStatusAsAdmin
+);
+
+router.delete(
+  '/admin/:id',
+  authMiddleware,
+  authorizeRoles('ADMIN', 'SUPER_ADMIN'),
+  listingsController.deleteListingAsAdmin
+);
 
 /**
  * @swagger

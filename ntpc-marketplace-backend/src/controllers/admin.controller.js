@@ -1,5 +1,14 @@
 const adminService = require('../services/admin.service');
 
+async function getDashboard(req, res, next) {
+  try {
+    const dashboard = await adminService.getDashboardSummary();
+    return res.status(200).json(dashboard);
+  } catch (err) {
+    return next(err);
+  }
+}
+
 async function getUsers(req, res, next) {
   try {
     const users = await adminService.listUsers();
@@ -55,6 +64,7 @@ async function rejectReport(req, res, next) {
 }
 
 module.exports = {
+  getDashboard,
   getUsers,
   deactivateUser,
   activateUser,

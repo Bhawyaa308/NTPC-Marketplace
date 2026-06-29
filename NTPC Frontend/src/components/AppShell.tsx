@@ -74,6 +74,7 @@ const superNav: NavItem[] = [
   { to: "/super-admin/townships", label: "Townships", icon: Map },
   { to: "/super-admin/audit-logs", label: "Audit Logs", icon: History },
   { to: "/super-admin/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/super-admin/profile", label: "Profile", icon: User },
   { to: "/super-admin/settings", label: "Settings", icon: Settings },
 ];
 
@@ -144,10 +145,16 @@ function TopNavbar({
   onMenu,
   onToggleCollapse,
   showMarketplaceControls = true,
+  showWishlist = true,
+  showNotifications = true,
+  role,
 }: {
   onMenu: () => void;
   onToggleCollapse: () => void;
   showMarketplaceControls?: boolean;
+  showWishlist?: boolean;
+  showNotifications?: boolean;
+  role: "employee" | "admin" | "super";
 }) {
   const [profile, setProfile] = useState<any>(null);
 
@@ -169,6 +176,9 @@ function TopNavbar({
   const nav = useNavigate();
   const wishlistCount = useStore((s) => s.wishlist.length);
   const { unreadCount: notifCount } = useNotifications();
+  const notificationPath = role === "admin" ? "/admin/notifications" : "/notifications";
+  const profilePath = role === "admin" ? "/admin/profile" : role === "super" ? "/super-admin/profile" : "/profile";
+  const settingsPath = role === "super" ? "/super-admin/settings" : "/settings";
   return (
     <header className="h-16 bg-surface border-b sticky top-0 z-30 flex items-center gap-3 px-4 lg:px-6">
       <button
@@ -225,30 +235,34 @@ function TopNavbar({
       {!showMarketplaceControls && <div className="flex-1" />}
 
       <div className="flex items-center gap-1 ml-auto">
-        <Link
-          to="/wishlist"
-          className="relative p-2 rounded hover:bg-muted"
-          aria-label="wishlist"
-        >
-          <Heart size={18} />
-          {wishlistCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center">
-              {wishlistCount}
-            </span>
-          )}
-        </Link>
-        <Link
-          to="/notifications"
-          className="relative p-2 rounded hover:bg-muted"
-          aria-label="notifications"
-        >
-          <Bell size={18} />
-          {notifCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center">
-              {notifCount}
-            </span>
-          )}
-        </Link>
+        {showWishlist ? (
+          <Link
+            to="/wishlist"
+            className="relative p-2 rounded hover:bg-muted"
+            aria-label="wishlist"
+          >
+            <Heart size={18} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+        ) : null}
+        {showNotifications ? (
+          <Link
+            to={notificationPath}
+            className="relative p-2 rounded hover:bg-muted"
+            aria-label="notifications"
+          >
+            <Bell size={18} />
+            {notifCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center">
+                {notifCount}
+              </span>
+            )}
+          </Link>
+        ) : null}
         <div className="relative">
           <button
             onClick={() => setMenu((v) => !v)}
@@ -276,14 +290,14 @@ function TopNavbar({
           {menu && (
             <div className="absolute right-0 mt-2 w-52 ntpc-card p-1 z-40">
               <Link
-                to="/profile"
+                to={profilePath}
                 onClick={() => setMenu(false)}
                 className="block px-3 py-2 text-sm rounded hover:bg-muted"
               >
                 My Profile
               </Link>
               <Link
-                to="/settings"
+                to={settingsPath}
                 onClick={() => setMenu(false)}
                 className="block px-3 py-2 text-sm rounded hover:bg-muted"
               >
@@ -341,6 +355,9 @@ export function AppShell({
           onMenu={() => setMobile(true)}
           onToggleCollapse={() => setCollapsed((v) => !v)}
           showMarketplaceControls={role === "employee"}
+          showWishlist={role === "employee"}
+          showNotifications={role !== "super"}
+          role={role}
         />
         <main className="flex-1 p-4 lg:p-8">{children}</main>
       </div>

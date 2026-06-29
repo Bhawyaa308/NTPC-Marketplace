@@ -16,8 +16,10 @@ const notificationsRoutes = require('./routes/notifications.routes');
 const categoriesRoutes = require('./routes/categories.routes');
 const profileRoutes = require('./routes/profile.routes');
 const reportsRoutes = require('./routes/reports.routes');
+const settingsRoutes = require('./routes/settings.routes');
 const transfersRoutes = require('./routes/transfers.routes');
 const townshipsRoutes = require('./routes/townships.routes');
+const superAdminRoutes = require('./routes/superAdmin.routes');
 
 const app = express();
 const cors = require("cors");
@@ -89,8 +91,10 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/settings', settingsRoutes);
 app.use('/api/transfers', transfersRoutes);
 app.use('/api/townships', townshipsRoutes);
+app.use('/api/super-admin', superAdminRoutes);
 
 // Fallback for unmatched routes
 app.use((req, res) => {

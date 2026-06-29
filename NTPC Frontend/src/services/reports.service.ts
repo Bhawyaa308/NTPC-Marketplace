@@ -20,8 +20,13 @@ export async function fetchAllReports() {
   return res.data ?? [];
 }
 
-export async function updateReportStatus(reportId: string | number, status: string) {
-  const res = await api.patch(`/reports/${reportId}/status`, { status });
+export async function resolveReport(reportId: string | number) {
+  const res = await api.patch(`/reports/${reportId}/resolve`);
+  return res.data;
+}
+
+export async function rejectReport(reportId: string | number) {
+  const res = await api.patch(`/reports/${reportId}/reject`);
   return res.data;
 }
 

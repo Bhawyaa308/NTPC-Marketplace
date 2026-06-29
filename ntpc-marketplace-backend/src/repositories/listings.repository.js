@@ -125,10 +125,15 @@ async function getListings(page, limit) {
       jsonb_build_object(
         'township_id', t.township_id,
         'name', t.name
-      ) AS township
+      ) AS township,
+      jsonb_build_object(
+        'user_id', u.user_id,
+        'name', u.name
+      ) AS seller
     FROM listings l
     LEFT JOIN categories c ON c.category_id = l.category_id
     LEFT JOIN townships t ON t.township_id = l.township_id
+    LEFT JOIN users u ON u.user_id = l.seller_id
     ORDER BY l.created_at DESC
     LIMIT $1 OFFSET $2`,
     [limit, offset]
@@ -140,6 +145,7 @@ async function getListings(page, limit) {
       image_urls: normalizeImageUrls(row.image_urls),
       category: row.category || { category_id: row.category_id, name: null },
       township: row.township || { township_id: row.township_id, name: null },
+      seller: row.seller || { user_id: row.seller_id, name: null },
     })),
     total: Number(totalResult.rows[0].total),
   };
@@ -270,6 +276,37 @@ async function updateListingById(listing_id, fields) {
   return rows[0];
 }
 
+async function updateListingStatus(listing_id, status) {
+  const { rows } = await pool.query(
+    `UPDATE listings
+     SET status = $2, updated_at = NOW()
+     WHERE listing_id = $1
+     RETURNING
+       listing_id,
+       seller_id,
+       category_id,
+       township_id,
+       title,
+       description,
+       price,
+       condition,
+       is_negotiable,
+       status,
+       view_count,
+       image_urls,
+       expires_at,
+       sold_at,
+       created_at,
+       updated_at`,
+    [listing_id, status]
+  );
+
+  return rows[0] ? {
+    ...rows[0],
+    image_urls: normalizeImageUrls(rows[0].image_urls),
+  } : null;
+}
+
 async function expireListing(listing_id) {
   const { rows } = await pool.query(
     `UPDATE listings
@@ -368,6 +405,7 @@ module.exports = {
   findListingById,
   incrementViewCount,
   updateListingById,
+  updateListingStatus,
   expireListing,
   updateListingToSold,
   addListingImages,

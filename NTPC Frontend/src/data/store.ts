@@ -4,7 +4,6 @@ import {
   NOTIFICATIONS,
   CONVERSATIONS,
   MESSAGES,
-  REPORTS,
   RESERVATIONS,
   TRANSFER_EMPLOYEES,
   type Listing,
@@ -13,7 +12,6 @@ import {
 type Msg = { id: string; from: "me" | "them"; text: string; time: string };
 type Conv = { id: string; name: string; role: string; last: string; time: string; unread: number };
 type Notif = { id: string; title: string; body: string; time: string; unread: boolean };
-type Report = { id: string; subject: string; status: string; date: string };
 type Reservation = { id: string; listing: Listing; status: string; date: string; buyer: string };
 type ListingStatus = "Active" | "Reserved" | "Sold" | "Expired" | "Hidden" | "Removed";
 
@@ -22,7 +20,6 @@ type State = {
   notifications: Notif[];
   conversations: Conv[];
   messagesByConv: Record<string, Msg[]>;
-  reports: Report[];
   reservations: Reservation[];
   myListings: (Listing & { status: ListingStatus })[];
   listingStatus: Record<string, ListingStatus>;
@@ -63,7 +60,6 @@ const state: State = {
   notifications: NOTIFICATIONS.map((n) => ({ ...n })),
   conversations: CONVERSATIONS.map((c) => ({ ...c })),
   messagesByConv: seedConvMessages(),
-  reports: REPORTS.map((r) => ({ ...r })),
   reservations: RESERVATIONS.map((r) => ({ ...r, buyer: "Rohan Mehta" })),
   myListings: LISTINGS.slice(0, 8).map((l, i) => ({
     ...l,
@@ -89,8 +85,6 @@ export function useStore<T>(selector: (s: State) => T): T {
 export const getState = () => state;
 
 const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-const today = () => new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-
 export const actions = {
   toggleWishlist(id: string) {
     state.wishlist = state.wishlist.includes(id)
@@ -129,12 +123,6 @@ export const actions = {
     const msg: Msg = { id: `m${Date.now()}`, from: "me", text: text.trim(), time: now() };
     state.messagesByConv[convId] = [...(state.messagesByConv[convId] || []), msg];
     state.conversations = state.conversations.map((c) => c.id === convId ? { ...c, last: msg.text, time: "now", unread: 0 } : c);
-    emit();
-  },
-
-  submitReport(subject: string) {
-    const r: Report = { id: `RP-${Math.floor(Math.random() * 900 + 100)}`, subject, status: "Open", date: today() };
-    state.reports = [r, ...state.reports];
     emit();
   },
 

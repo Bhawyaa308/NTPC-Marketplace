@@ -60,10 +60,38 @@ async function updateProfileById(user_id, fields) {
     [...values, user_id]
   );
 
-  return rows[0];
+  if (!rows[0]) {
+    return null;
+  }
+
+  return getProfileByUserId(user_id);
+}
+
+async function findDepartmentIdByName(name) {
+  const { rows } = await pool.query(
+    `SELECT department_id
+     FROM departments
+     WHERE LOWER(department_name) = LOWER($1)
+     LIMIT 1`,
+    [name]
+  );
+  return rows[0]?.department_id;
+}
+
+async function findTownshipIdByName(name) {
+  const { rows } = await pool.query(
+    `SELECT township_id
+     FROM townships
+     WHERE LOWER(name) = LOWER($1)
+     LIMIT 1`,
+    [name]
+  );
+  return rows[0]?.township_id;
 }
 
 module.exports = {
   getProfileByUserId,
   updateProfileById,
+  findDepartmentIdByName,
+  findTownshipIdByName,
 };

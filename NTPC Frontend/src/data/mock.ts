@@ -131,12 +131,6 @@ export const MESSAGES = [
   { id: "M5", from: "them", text: "Sure, you can pick it up Sunday.", time: "10:09 AM" },
 ];
 
-export const REPORTS = [
-  { id: "RP-01", subject: "Suspicious listing — overpriced", status: "Open", date: "10 Jun" },
-  { id: "RP-02", subject: "Seller not responding", status: "Resolved", date: "02 Jun" },
-  { id: "RP-03", subject: "Inappropriate description", status: "In Review", date: "28 May" },
-];
-
 export const ADMIN_USERS = sellers.map((s, i) => ({
   id: `U-${100 + i}`,
   name: s.name,

@@ -5,6 +5,20 @@ const { authorizeRoles } = require('../middlewares/rbac.middleware');
 
 const router = express.Router();
 
+router.get(
+  '/dashboard',
+  authMiddleware,
+  authorizeRoles('ADMIN', 'SUPER_ADMIN'),
+  adminController.getDashboard
+);
+
+router.get(
+  '/stats',
+  authMiddleware,
+  authorizeRoles('ADMIN', 'SUPER_ADMIN'),
+  adminController.getDashboard
+);
+
 /**
  * @swagger
  * /api/admin/users:

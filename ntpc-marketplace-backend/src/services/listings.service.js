@@ -1,6 +1,7 @@
 const listingsRepository = require('../repositories/listings.repository');
 
 const VALID_CONDITIONS = ['NEW', 'LIKE_NEW', 'GOOD', 'FAIR'];
+const ADMIN_STATUSES = ['ACTIVE', 'EXPIRED'];
 
 function normalizeListing(listing) {
   if (!listing) {
@@ -266,6 +267,49 @@ async function getListingImages(listing_id) {
   return normalizeListing(listing).image_urls || [];
 }
 
+async function updateListingStatusAsAdmin(admin_user_id, listing_id, status) {
+  const normalizedStatus = String(status || '').trim().toUpperCase();
+  if (!ADMIN_STATUSES.includes(normalizedStatus)) {
+    throw createError(400, 'Invalid listing status');
+  }
+
+  const existingListing = await listingsRepository.findListingById(listing_id);
+  if (!existingListing) {
+    throw createError(404, 'Listing not found');
+  }
+
+  const updatedListing = await listingsRepository.updateListingStatus(listing_id, normalizedStatus);
+
+  const auditService = require('./audit.service');
+  await auditService.logEvent({
+    user_id: admin_user_id,
+    action: `ADMIN_LISTING_${normalizedStatus}`,
+    entity_type: 'LISTING',
+    entity_id: listing_id,
+  });
+
+  return normalizeListing(updatedListing);
+}
+
+async function deleteListingAsAdmin(admin_user_id, listing_id) {
+  const existingListing = await listingsRepository.findListingById(listing_id);
+  if (!existingListing) {
+    throw createError(404, 'Listing not found');
+  }
+
+  const updatedListing = await listingsRepository.updateListingStatus(listing_id, 'EXPIRED');
+
+  const auditService = require('./audit.service');
+  await auditService.logEvent({
+    user_id: admin_user_id,
+    action: 'ADMIN_LISTING_DELETED',
+    entity_type: 'LISTING',
+    entity_id: listing_id,
+  });
+
+  return normalizeListing(updatedListing);
+}
+
 module.exports = {
   createListing,
   getAllListings,
@@ -275,4 +319,6 @@ module.exports = {
   addListingImages,
   deleteListingImage,
   getListingImages,
+  updateListingStatusAsAdmin,
+  deleteListingAsAdmin,
 };

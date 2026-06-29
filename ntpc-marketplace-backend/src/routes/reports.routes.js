@@ -21,7 +21,11 @@ router.patch('/:id/withdraw', authMiddleware, reportsController.withdrawReport);
 // Admin: get all reports
 router.get('/', authMiddleware, authorizeRoles('ADMIN', 'SUPER_ADMIN'), reportsController.getAllReports);
 
-// Admin: update report status
+// Admin: resolve or reject a report
+router.patch('/:id/resolve', authMiddleware, authorizeRoles('ADMIN', 'SUPER_ADMIN'), reportsController.resolveReport);
+router.patch('/:id/reject', authMiddleware, authorizeRoles('ADMIN', 'SUPER_ADMIN'), reportsController.rejectReport);
+
+// Admin: update report status (kept for existing callers)
 router.patch('/:id/status', authMiddleware, authorizeRoles('ADMIN', 'SUPER_ADMIN'), reportsController.updateReportStatus);
 
 module.exports = router;

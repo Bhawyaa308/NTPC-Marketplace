@@ -139,6 +139,28 @@ async function uploadImages(req, res, next) {
   }
 }
 
+async function updateListingStatusAsAdmin(req, res, next) {
+  try {
+    const listing = await listingsService.updateListingStatusAsAdmin(
+      req.user.user_id,
+      req.params.id,
+      req.body?.status
+    );
+    return res.status(200).json(listing);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function deleteListingAsAdmin(req, res, next) {
+  try {
+    const listing = await listingsService.deleteListingAsAdmin(req.user.user_id, req.params.id);
+    return res.status(200).json(listing);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   createListing,
   getAllListings,
@@ -149,4 +171,6 @@ module.exports = {
   deleteListingImage,
   getListingImages,
   uploadImages,
+  updateListingStatusAsAdmin,
+  deleteListingAsAdmin,
 };

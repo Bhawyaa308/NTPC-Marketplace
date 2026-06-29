@@ -7,6 +7,7 @@ import { Toaster } from "../components/ui/sonner";
 import {
   createReport,
   fetchMyReports,
+  getReportById,
   withdrawReport,
 } from "../services/reports.service";
 
@@ -20,6 +21,10 @@ type ReportItem = {
   reason?: string;
   status?: string;
   created_at?: string;
+  resolved_at?: string;
+  listing_title?: string;
+  reporter_name?: string;
+  seller_name?: string;
 };
 
 function formatRelativeTime(value?: string) {
@@ -83,11 +88,14 @@ function Reports() {
     try {
       setSubmitting(true);
       setError("");
-      await createReport({ listing_id: listingId, reason: reason.trim() });
+      const created = await createReport({
+        listing_id: listingId,
+        reason: reason.trim(),
+      });
+      setReports((current) => [created, ...current]);
       setDone(true);
       setListingId("");
       setReason("");
-      await loadReports();
     } catch (err: any) {
       setError(
         err?.response?.data?.message || "Unable to submit report right now.",
@@ -105,9 +113,18 @@ function Reports() {
     setReason("");
   };
 
-  const openDetails = (report: ReportItem) => {
+  const openDetails = async (report: ReportItem) => {
     setSelectedReport(report);
     setDetailOpen(true);
+    const reportId = report.report_id;
+    if (reportId === undefined || reportId === null) return;
+
+    try {
+      const data = await getReportById(reportId);
+      setSelectedReport(data);
+    } catch (err) {
+      console.error("Failed to load report details", err);
+    }
   };
 
   const closeDetails = () => {
@@ -123,9 +140,13 @@ function Reports() {
     try {
       setWithdrawing(true);
       setError("");
-      await withdrawReport(reportId);
-      await loadReports();
-      closeDetails();
+      const updated = await withdrawReport(reportId);
+      setReports((current) =>
+        current.map((report) =>
+          String(report.report_id) === String(reportId) ? updated : report,
+        ),
+      );
+      setSelectedReport(updated);
       toast.success("Report withdrawn successfully.");
     } catch (err: any) {
       setError(
@@ -176,9 +197,14 @@ function Reports() {
             >
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-muted-foreground">
-                  {r.report_id} · {formatRelativeTime(r.created_at)}
+                  {r.report_id} - {formatRelativeTime(r.created_at)}
                 </div>
-                <div className="font-semibold truncate">{r.reason}</div>
+                <div className="font-semibold truncate">
+                  {r.listing_title || `Listing #${r.listing_id}`}
+                </div>
+                <div className="text-xs text-muted-foreground truncate mt-1">
+                  {r.reason}
+                </div>
               </div>
               <StatusBadge status={r.status} />
             </div>
@@ -258,11 +284,15 @@ function Reports() {
           <div className="space-y-3 text-sm">
             <div>
               <div className="font-semibold mb-1">Listing ID</div>
-              <div>{selectedReport.listing_id ?? "—"}</div>
+              <div>{selectedReport.listing_id ?? "-"}</div>
+            </div>
+            <div>
+              <div className="font-semibold mb-1">Listing Title</div>
+              <div>{selectedReport.listing_title ?? "-"}</div>
             </div>
             <div>
               <div className="font-semibold mb-1">Reason</div>
-              <div>{selectedReport.reason ?? "—"}</div>
+              <div>{selectedReport.reason ?? "-"}</div>
             </div>
             <div>
               <div className="font-semibold mb-1">Status</div>
@@ -273,9 +303,15 @@ function Reports() {
               <div>
                 {selectedReport.created_at
                   ? new Date(selectedReport.created_at).toLocaleString()
-                  : "—"}
+                  : "-"}
               </div>
             </div>
+            {selectedReport.resolved_at ? (
+              <div>
+                <div className="font-semibold mb-1">Resolved At</div>
+                <div>{new Date(selectedReport.resolved_at).toLocaleString()}</div>
+              </div>
+            ) : null}
             {String(selectedReport.status || "").toUpperCase() === "OPEN" ? (
               <div className="pt-2">
                 <button

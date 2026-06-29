@@ -11,6 +11,10 @@ async function listUsers() {
   return adminRepository.getAllUsers();
 }
 
+async function getDashboardSummary() {
+  return adminRepository.getDashboardSummary();
+}
+
 async function deactivateUser(user_id, currentAdminId) {
   if (String(user_id) === String(currentAdminId)) {
     throw createError(403, 'Admins cannot deactivate their own account');
@@ -92,6 +96,7 @@ async function rejectReport(report_id, admin_user_id) {
 }
 
 module.exports = {
+  getDashboardSummary,
   listUsers,
   deactivateUser,
   activateUser,
